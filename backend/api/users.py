@@ -7,6 +7,8 @@ from backend.db.dependencies import get_db
 from backend.models.user import User
 from backend.schemas.user import UserCreate, UserLogin
 
+from backend.core.jwt import create_access_token
+
 router = APIRouter(
     prefix="/users",
     tags=["Users"]
@@ -77,9 +79,13 @@ def login_user(
             detail="Invalid email or password"
         )
 
-    return {
+    access_token = create_access_token(str(existing_user.id))
+    return{
         "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer",
         "id": existing_user.id,
         "email": existing_user.email,
         "name": existing_user.name
+
     }
