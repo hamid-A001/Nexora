@@ -3,6 +3,7 @@ import os
 
 import jwt
 from dotenv import load_dotenv
+from fastapi import HTTPException, status
 
 
 load_dotenv()
@@ -28,3 +29,28 @@ def create_access_token(user_id: str) -> str:
         SECRET_KEY,
         algorithm=ALGORITHM,
     )
+
+
+def decode_access_token(token: str) -> str:
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+        )
+
+        user_id = payload.get("sub")
+
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+            )
+
+        return user_id
+
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+        )
