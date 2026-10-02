@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from backend.core.security import hash_password, verify_password
 from backend.db.dependencies import get_db, get_current_user_id
 from backend.models.user import User
-from backend.schemas.user import UserCreate, UserLogin
+from backend.schemas.user import UserCreate, UserLogin, UserResponse
 
 from backend.core.jwt import create_access_token
 
@@ -90,7 +90,7 @@ def login_user(
 
     }
     
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 def get_me(
     user_id: str = Depends(get_current_user_id),
     db: Session = Depends(get_db)
